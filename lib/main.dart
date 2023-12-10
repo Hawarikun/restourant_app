@@ -1,5 +1,6 @@
-import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:animated_splash_screen/animated_splash_screen.dart';
+
 import 'package:restourant_app/models/restaurant.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
 import 'package:restourant_app/pages/home_page.dart';

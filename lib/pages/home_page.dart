@@ -10,7 +10,6 @@ import 'package:restourant_app/models/restaurant.dart';
 import 'package:restourant_app/style/style.dart';
 
 class HomePage extends StatefulWidget {
-
   const HomePage({super.key});
 
   @override
