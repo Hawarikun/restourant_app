@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:restourant_app/models/restaurant.dart';
+import 'package:restourant_app/data/model/restaurant.dart';
 import 'package:restourant_app/package/widget/costum_scaffold.dart';
 import 'package:restourant_app/style/style.dart';
 
 class RestaurantDetail extends StatelessWidget {
   static const routeName = '/restaurant_detail';
 
-  final Restaurant restaurant;
+  final DetailRestaurant restaurant;
 
   const RestaurantDetail({Key? key, required this.restaurant})
       : super(key: key);
@@ -24,9 +24,9 @@ class RestaurantDetail extends StatelessWidget {
               flexibleSpace: FlexibleSpaceBar(
                 background: Hero(
                   transitionOnUserGestures: false,
-                  tag: restaurant.url,
+                  tag: restaurant.pictureId,
                   child: Image.network(
-                    restaurant.url,
+                    restaurant.pictureId,
                     fit: BoxFit.fitWidth,
                     errorBuilder: (ctx, error, _) =>
                         const Center(child: Icon(Icons.error)),

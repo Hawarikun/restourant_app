@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:restourant_app/models/restaurant.dart';
+import 'package:restourant_app/data/model/restaurant.dart';
 
 class CustomScaffold extends StatelessWidget {
-  final Restaurant restaurant;
+  final DetailRestaurant restaurant;
   final Widget body;
 
   const CustomScaffold({Key? key, required this.body, required this.restaurant})

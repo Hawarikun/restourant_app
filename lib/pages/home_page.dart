@@ -1,12 +1,11 @@
-import 'dart:convert';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_search_bar/easy_search_bar.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:restourant_app/data/api/api_service.dart';
 
+import 'package:restourant_app/data/model/restaurant.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
-import 'package:restourant_app/models/restaurant.dart';
 import 'package:restourant_app/style/style.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,30 +18,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   String searchValue = "";
 
+  // restaurant
+  late Future<List<Restaurant>> restaurant;
+
+  /// restaurant List
+  List<Restaurant> restaurantList = [];
+
   // restaurant list after search
   List<Restaurant> searchRestaurant = [];
-
-  // restaurant list
-  List<Restaurant> restaurantList = [];
 
   // Restaurant by rating
   List<Restaurant> byRating = [];
 
   @override
   void initState() {
+    restaurant = ApiService().getAllRestaurant();
     super.initState();
     fetchAndParseRestaurantList();
-  }
-
-  List<Restaurant> parseRestaurant(String? json) {
-    if (json == null) {
-      return [];
-    }
-
-    final Map<String, dynamic> parsed = jsonDecode(json);
-    final List<dynamic> restaurants = parsed['restaurants'];
-
-    return restaurants.map((json) => Restaurant.fromJson(json)).toList();
   }
 
   // filter restaurant by search
@@ -54,19 +46,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   // call data restaurant
-  Future<void> fetchAndParseRestaurantList() async {
+  Future fetchAndParseRestaurantList() async {
     try {
-      String jsonString = await DefaultAssetBundle.of(context)
-          .loadString('assets/data/local_restaurant.json');
-      List<Restaurant> restaurants = parseRestaurant(jsonString);
+      restaurantList = await restaurant;
 
-      List<Restaurant> sortByRating = List.from(restaurants);
+      List<Restaurant> sortByRating = List.from(restaurantList);
       sortByRating.sort((a, b) => b.rating.compareTo(a.rating));
 
       List<Restaurant> top5Restaurants = sortByRating.take(5).toList();
 
       setState(() {
-        restaurantList = restaurants;
+        restaurantList;
         searchRestaurant = filterRestaurants(restaurantList, searchValue);
         byRating = top5Restaurants;
       });
@@ -97,12 +87,11 @@ class _HomePageState extends State<HomePage> {
       ),
 
       // Call Data Futere
-      body: FutureBuilder<String>(
-        future: DefaultAssetBundle.of(context)
-            .loadString('assets/data/local_restaurant.json'),
+      body: FutureBuilder(
+        future: restaurant,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else if (!snapshot.hasData) {
@@ -199,7 +188,8 @@ Widget _corouselSliderCostum(List data) {
                   margin: const EdgeInsets.symmetric(horizontal: 5.0),
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(restaurant.url),
+                      image: NetworkImage(
+                          'https://restaurant-api.dicoding.dev/images/medium/${restaurant.pictureId}'),
                       fit: BoxFit.fill,
                       onError: (ctx, error) =>
                           const Center(child: Icon(Icons.error)),
@@ -275,13 +265,12 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
     elevation: 2,
     child: ListTile(
       leading: Hero(
-        tag: restaurant.url,
+        tag: restaurant.pictureId,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image.network(
-            restaurant.url,
+            "https://restaurant-api.dicoding.dev/images/small/${restaurant.pictureId}",
             width: 75,
-            height: 75,
             fit: BoxFit.fill,
             errorBuilder: (ctx, error, _) =>
                 const Center(child: Icon(Icons.error)),
