@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:provider/provider.dart';
 
 import 'package:restourant_app/data/model/restaurant.dart';
+import 'package:restourant_app/package/provider/globalProvider.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
 import 'package:restourant_app/pages/home_page.dart';
 import 'package:restourant_app/style/style.dart';
@@ -15,45 +17,48 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Dicoding - Restaurant_App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: primaryColor,
-        textTheme: myTextTheme,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ).copyWith(
-        pageTransitionsTheme: const PageTransitionsTheme(
-          builders: <TargetPlatform, PageTransitionsBuilder>{
-            TargetPlatform.android: ZoomPageTransitionsBuilder(),
-          },
+    return ChangeNotifierProvider(
+      create: (context) => GlobalProvider(),
+      child: MaterialApp(
+        title: 'Dicoding - Restaurant_App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primaryColor: primaryColor,
+          textTheme: myTextTheme,
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ).copyWith(
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: <TargetPlatform, PageTransitionsBuilder>{
+              TargetPlatform.android: ZoomPageTransitionsBuilder(),
+            },
+          ),
         ),
-      ),
 
-      // Splash Screen
-      home: AnimatedSplashScreen(
-        splash: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: primaryColor,
-          ),
-          child: const Icon(
-            Icons.restaurant_menu_rounded,
-            size: 54,
-            color: Colors.white,
-          ),
-        ),
-        nextScreen: const HomePage(),
-        splashTransition: SplashTransition.fadeTransition,
-      ),
-      routes: {
-        RestaurantDetail.routeName: (context) => RestaurantDetail(
-              restaurant: ModalRoute.of(context)?.settings.arguments
-                  as DetailRestaurant,
+        // Splash Screen
+        home: AnimatedSplashScreen(
+          splash: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: primaryColor,
             ),
-      },
+            child: const Icon(
+              Icons.restaurant_menu_rounded,
+              size: 54,
+              color: Colors.white,
+            ),
+          ),
+          nextScreen: const HomePage(),
+          splashTransition: SplashTransition.fadeTransition,
+        ),
+        routes: {
+          RestaurantDetail.routeName: (context) => RestaurantDetail(
+                restaurant:
+                    ModalRoute.of(context)?.settings.arguments as Restaurant,
+              ),
+        },
+      ),
     );
   }
 }

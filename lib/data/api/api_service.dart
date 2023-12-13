@@ -1,6 +1,9 @@
 import 'dart:convert';
+import "package:flutter/material.dart";
 import "package:http/http.dart" as http;
+import "package:provider/provider.dart";
 import "package:restourant_app/data/model/restaurant.dart";
+import "package:restourant_app/package/provider/globalProvider.dart";
 
 class ApiService {
   static const String _baseUrl = 'https://restaurant-api.dicoding.dev/';
@@ -24,15 +27,23 @@ class ApiService {
     }
   }
 
-  Future<DetailRestaurant> getDetailRestaurant() async {
-    final response = await http.get(Uri.parse("$_baseUrl/detail/:id"));
+  Future<DetailRestaurant> getDetailRestaurant(BuildContext context) async {
+    final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
+
+    final response = await http.get(
+        Uri.parse("$_baseUrl/detail/${globalProvider.detailRestaurantId}"));
+
+    print(response.body);
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
 
-      dynamic detailRestaurantData = data['restaurants'];
+      dynamic detailRestaurantData = data['restaurant'];
 
-      DetailRestaurant detailRestaurant = detailRestaurantData;
+      DetailRestaurant detailRestaurant =
+          DetailRestaurant.fromJson(detailRestaurantData);
+
+      print(detailRestaurant);
 
       return detailRestaurant;
     } else {

@@ -1,10 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:easy_search_bar/easy_search_bar.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:provider/provider.dart';
 import 'package:restourant_app/data/api/api_service.dart';
 
 import 'package:restourant_app/data/model/restaurant.dart';
+import 'package:restourant_app/package/provider/globalProvider.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
 import 'package:restourant_app/style/style.dart';
 
@@ -87,73 +90,107 @@ class _HomePageState extends State<HomePage> {
       ),
 
       // Call Data Futere
-      body: FutureBuilder(
-        future: restaurant,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (!snapshot.hasData) {
-            return const Text('No data available');
+      body: Consumer<GlobalProvider>(
+        builder: (context, globalProvider, child) {
+          if (globalProvider.connectionStatus == ConnectivityResult.none) {
+            return Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.wifi_off_rounded),
+                    const SizedBox(height: 5),
+                    const Text('No connection'),
+                    const SizedBox(height: 5),
+                    ElevatedButton(
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        child: const Text("refresh"))
+                  ],
+                ),
+              ),
+            );
           } else {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                //  ketika searchValue kosong tampilkan
-                if (searchValue.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Text(
-                      "Recommendation for you",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-
-                //  ketika searchValue kosong tampilkan
-                if (searchValue.isEmpty) _corouselSliderCostum(byRating),
-
-                //  ketika searchValue kosong tampilkan
-                if (searchValue.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Text(
-                      "Explore Restaurant",
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-
-                //  ketika searchValue kosong ataupun tidak kosong tampilkan
-                if (searchValue.isEmpty || searchValue.isNotEmpty)
-                  Expanded(
-                    child: AnimationLimiter(
-                      child: ListView.builder(
-                        itemCount: searchRestaurant.length,
-                        itemBuilder: (context, index) {
-                          return AnimationConfiguration.staggeredList(
-                            position: index,
-                            duration: const Duration(milliseconds: 800),
-                            child: SlideAnimation(
-                              verticalOffset: 100.0,
-                              child: FadeInAnimation(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 5),
-                                  child: _buildRestaurantItem(
-                                    context,
-                                    searchRestaurant[index],
-                                  ),
-                                ),
+            return RefreshIndicator(
+              onRefresh: () async {
+                await globalProvider.initConnectivity();
+                setState(() {});
+              },
+              child: FutureBuilder(
+                future: restaurant,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData) {
+                    return const Text('No data available');
+                  } else {
+                    return SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //  ketika searchValue kosong tampilkan
+                          if (searchValue.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Text(
+                                "Recommendation for you",
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
                               ),
                             ),
-                          );
-                        },
+
+                          //  ketika searchValue kosong tampilkan
+                          if (searchValue.isEmpty)
+                            _corouselSliderCostum(context, byRating),
+
+                          //  ketika searchValue kosong tampilkan
+                          if (searchValue.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(12.0),
+                              child: Text(
+                                "Explore Restaurant",
+                                style: TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+
+                          //  ketika searchValue kosong ataupun tidak kosong tampilkan
+                          if (searchValue.isEmpty || searchValue.isNotEmpty)
+                            AnimationLimiter(
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: searchRestaurant.length,
+                                itemBuilder: (context, index) {
+                                  return AnimationConfiguration.staggeredList(
+                                    position: index,
+                                    duration: const Duration(milliseconds: 800),
+                                    child: SlideAnimation(
+                                      verticalOffset: 100.0,
+                                      child: FadeInAnimation(
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 5),
+                                          child: _buildRestaurantItem(
+                                            context,
+                                            searchRestaurant[index],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                        ],
                       ),
-                    ),
-                  ),
-              ],
+                    );
+                  }
+                },
+              ),
             );
           }
         },
@@ -162,7 +199,9 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-Widget _corouselSliderCostum(List data) {
+Widget _corouselSliderCostum(BuildContext context, List data) {
+  final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
+
   return CarouselSlider(
     options: CarouselOptions(
       aspectRatio: 2.3,
@@ -175,6 +214,8 @@ Widget _corouselSliderCostum(List data) {
         builder: (BuildContext context) {
           return InkWell(
             onTap: () {
+              globalProvider.setDetailRestaurantID(restaurant.id.toString());
+              print(restaurant.id);
               Navigator.pushNamed(
                 context,
                 RestaurantDetail.routeName,
@@ -260,6 +301,7 @@ Widget _corouselSliderCostum(List data) {
 
 //  Build Restauran Content
 Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
+  final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
   return Card(
     surfaceTintColor: Colors.white,
     elevation: 2,
@@ -324,6 +366,7 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
         ],
       ),
       onTap: () {
+        globalProvider.setDetailRestaurantID(restaurant.id);
         Navigator.pushNamed(
           context,
           RestaurantDetail.routeName,
