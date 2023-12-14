@@ -28,6 +28,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
     final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
     Provider.of<GlobalProvider>(context, listen: false).getData(context);
 
+    /// check conection
     return globalProvider.connectionStatus == ConnectivityResult.none
         ? Scaffold(
             body: Center(
@@ -49,6 +50,8 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
           )
         : CustomScaffold(
             restaurant: widget.restaurant,
+
+            /// get detail retaurant from future
             body: FutureBuilder(
               future: Future.delayed(const Duration(seconds: 2),
                   () => globalProvider.detailRestaurantData),
@@ -70,10 +73,11 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                         const Text('No connection'),
                         const SizedBox(height: 5),
                         ElevatedButton(
-                            onPressed: () {
-                              setState(() {});
-                            },
-                            child: const Text("refresh"))
+                          onPressed: () {
+                            setState(() {});
+                          },
+                          child: const Text("refresh"),
+                        ),
                       ],
                     ),
                   );
@@ -100,6 +104,8 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                         ),
                       ];
                     },
+
+                    /// pull to refresh
                     body: RefreshIndicator(
                         onRefresh: () async {
                           setState(() {});

@@ -43,7 +43,6 @@ class _HomePageState extends State<HomePage> {
             globalProvider.getSearchData(context);
           },
         ),
-
         body: globalProvider.connectionStatus == ConnectivityResult.none
             ? Scaffold(
                 body: Center(
@@ -54,6 +53,8 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 5),
                       const Text('No connection'),
                       const SizedBox(height: 5),
+
+                      /// refresh conection
                       ElevatedButton(
                           onPressed: () {
                             setState(() {});
@@ -65,12 +66,14 @@ class _HomePageState extends State<HomePage> {
               )
             :
 
-            /// refresh conection
+            /// pull to refresh
+
             RefreshIndicator(
                 onRefresh: () async {
                   setState(() {});
                 },
-        /// Call Data Futere
+
+                /// Call Data Futere
                 child: FutureBuilder(
                   future: globalProvider.searchRestaurantData,
                   builder: (context, snapshot) {
@@ -220,7 +223,6 @@ Widget _corouselSliderCostum(BuildContext context, List data) {
             },
             child: Stack(
               children: [
-
                 /// image
                 Container(
                   width: MediaQuery.of(context).size.width,
@@ -241,7 +243,6 @@ Widget _corouselSliderCostum(BuildContext context, List data) {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-
                       /// restauran name
                       Expanded(
                         child: Padding(
@@ -306,7 +307,6 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
     surfaceTintColor: Colors.white,
     elevation: 2,
     child: ListTile(
-
       /// hero
       leading: Hero(
         tag: restaurant.pictureId,
