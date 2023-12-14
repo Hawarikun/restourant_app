@@ -24,7 +24,7 @@ class ApiService {
 
       return restaurants;
     } else {
-      // Jika request tidak berhasil, lempar exception dengan pesan status code
+      /// Jika request tidak berhasil, lempar exception dengan pesan status code
       throw Exception(
           'Failed to load restaurants, status code: ${response.statusCode}');
     }
@@ -93,14 +93,14 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        // Berhasil, respon dari server
+        /// Berhasil, respon dari server
         print('Response: ${response.body}');
       } else {
-        // Gagal, respon error dari server
+        /// Gagal, respon error dari server
         print('Error: ${response.statusCode}, ${response.body}');
       }
     } catch (error) {
-      // Tangani kesalahan koneksi atau lainnya
+      /// Tangani kesalahan koneksi atau lainnya
       print('Error: $error');
     }
   }

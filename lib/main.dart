@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
 
-        // Splash Screen
+        /// Splash Screen
         home: AnimatedSplashScreen(
           splash: Container(
             padding: const EdgeInsets.all(16),

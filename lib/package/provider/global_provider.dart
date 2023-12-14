@@ -22,13 +22,16 @@ class GlobalProvider extends ChangeNotifier {
   DetailRestaurant? _detailRestaurant;
 
   List<Restaurant> _searchRestaurant = [];
-  //// restaurant List
+  /// restaurant List
   List<Restaurant> restaurantList = [];
 
   /// Restaurant by rating
   List<Restaurant> byRating = [];
 
+  /// id for add reviews
   String _detailRestaurantId = "";
+  
+  /// search value
   String _searchValue = "";
 
   /// get
@@ -152,4 +155,5 @@ class GlobalProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  ///
 }
