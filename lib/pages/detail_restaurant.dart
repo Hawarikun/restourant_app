@@ -134,18 +134,22 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               /// restaurant location
-              Row(
-                children: [
-                  const Icon(
-                    Icons.location_on,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    "${widget.restaurant.city}, ${globalProvider.detailrestaurant!.address}",
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ],
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      "${globalProvider.detailrestaurant!.address}, ${widget.restaurant.city}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
               ),
 
               /// rating

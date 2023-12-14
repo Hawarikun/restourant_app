@@ -47,31 +47,35 @@ class GlobalProvider extends ChangeNotifier {
   String get detailRestaurantId => _detailRestaurantId;
   String get searchValue => _searchValue;
 
+  /// set id
   void setDetailRestaurantID(String id) {
     _detailRestaurantId = id;
 
     notifyListeners();
   }
 
+  /// set search value
   void setSearchValue(String search) {
     _searchValue = search;
 
     notifyListeners();
   }
 
+  /// set name
   void onChangeName(String value) {
     _nameController.text = value;
 
     notifyListeners();
   }
 
+  /// set review
   void onChangeReview(String value) {
     _reviewController.text = value;
 
     notifyListeners();
   }
 
-  /// get list data restourant dari api
+  /// get list data restourant from api
   Future fetchAndParseRestaurantList() async {
     try {
       restaurant = ApiService().getAllRestaurant();
@@ -92,6 +96,7 @@ class GlobalProvider extends ChangeNotifier {
     }
   }
 
+  /// get detail data restaurant from api
   Future<void> getData(BuildContext context) async {
     try {
       _detailRestaurantData = ApiService().getDetailRestaurant(context);
@@ -104,6 +109,7 @@ class GlobalProvider extends ChangeNotifier {
     }
   }
 
+  /// get data restourant by search from api 
   Future<void> getSearchData(BuildContext context) async {
     try {
       searchRestaurantData = ApiService().searchRestaurant(context);
@@ -116,10 +122,12 @@ class GlobalProvider extends ChangeNotifier {
     }
   }
 
+  /// send data review to api
   Future sendReview(BuildContext context) async {
     await ApiService().addReview(context);
   }
 
+  /// clear variable for add review
   void clear() {
     _nameController.clear();
     _reviewController.clear();
