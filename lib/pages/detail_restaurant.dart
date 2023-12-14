@@ -9,6 +9,7 @@ import 'package:restourant_app/package/provider/global_provider.dart';
 import 'package:restourant_app/package/widget/costum_scaffold.dart';
 import 'package:restourant_app/style/style.dart';
 
+/// use statefulwidget for refresh page with setState
 class RestaurantDetail extends StatefulWidget {
   static const routeName = '/restaurant_detail';
 

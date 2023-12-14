@@ -11,6 +11,7 @@ import 'package:restourant_app/package/provider/global_provider.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
 import 'package:restourant_app/style/style.dart';
 
+/// use statefulwidget for refresh page with setState
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
