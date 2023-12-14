@@ -43,7 +43,6 @@ class _HomePageState extends State<HomePage> {
           },
         ),
 
-        /// Call Data Futere
         body: globalProvider.connectionStatus == ConnectivityResult.none
             ? Scaffold(
                 body: Center(
@@ -70,6 +69,7 @@ class _HomePageState extends State<HomePage> {
                 onRefresh: () async {
                   setState(() {});
                 },
+        /// Call Data Futere
                 child: FutureBuilder(
                   future: globalProvider.searchRestaurantData,
                   builder: (context, snapshot) {
@@ -219,6 +219,8 @@ Widget _corouselSliderCostum(BuildContext context, List data) {
             },
             child: Stack(
               children: [
+
+                /// image
                 Container(
                   width: MediaQuery.of(context).size.width,
                   margin: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -238,6 +240,8 @@ Widget _corouselSliderCostum(BuildContext context, List data) {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+
+                      /// restauran name
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.all(12),
@@ -301,8 +305,12 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
     surfaceTintColor: Colors.white,
     elevation: 2,
     child: ListTile(
+
+      /// hero
       leading: Hero(
         tag: restaurant.pictureId,
+
+        /// image
         child: ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: Image.network(
