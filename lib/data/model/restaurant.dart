@@ -71,7 +71,8 @@ class DetailRestaurant {
 
   String toRawJson() => json.encode(toJson());
 
-  factory DetailRestaurant.fromJson(Map<String, dynamic> json) => DetailRestaurant(
+  factory DetailRestaurant.fromJson(Map<String, dynamic> json) =>
+      DetailRestaurant(
         id: json["id"],
         name: json["name"],
         description: json["description"],

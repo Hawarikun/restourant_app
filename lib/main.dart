@@ -3,7 +3,7 @@ import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:provider/provider.dart';
 
 import 'package:restourant_app/data/model/restaurant.dart';
-import 'package:restourant_app/package/provider/globalProvider.dart';
+import 'package:restourant_app/package/provider/global_provider.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
 import 'package:restourant_app/pages/home_page.dart';
 import 'package:restourant_app/style/style.dart';
