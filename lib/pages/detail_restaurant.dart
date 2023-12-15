@@ -342,6 +342,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
 
   Future<void> _showAddReview(BuildContext context) {
     return showModalBottomSheet<void>(
+      useSafeArea: true,
       isScrollControlled: true,
       backgroundColor: Colors.white,
       context: context,
@@ -353,91 +354,93 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
             padding: const EdgeInsets.all(16),
             height: 300,
             child: Consumer<GlobalProvider>(
-              builder: (context, globalProvider, _) => Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Add Your Review'),
+              builder: (context, globalProvider, _) => SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Add Your Review'),
 
-                      /// close
-                      IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          globalProvider.clear();
-                        },
-                        icon: const Icon(Icons.close),
-                      ),
-                    ],
-                  ),
-
-                  /// Name
-                  const Text("Name"),
-                  const SizedBox(height: 5),
-                  TextField(
-                    autofocus: true,
-                    style: const TextStyle(fontSize: 10),
-                    controller: globalProvider.nameController,
-                    textCapitalization: TextCapitalization.sentences,
-                    textInputAction: TextInputAction.next,
-                    onSubmitted: (value) {
-                      globalProvider.onChangeName(value);
-                    },
-                    decoration: const InputDecoration(
-                      hintText: "Your Name",
-                      hintStyle: TextStyle(fontSize: 10),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(),
-                      ),
-                    ),
-                  ),
-
-                  /// Review
-                  const SizedBox(height: 5),
-                  const Text("Review"),
-                  const SizedBox(height: 5),
-                  TextField(
-                    style: const TextStyle(fontSize: 10),
-                    controller: globalProvider.reviewController,
-                    maxLines: 3,
-                    textCapitalization: TextCapitalization.sentences,
-                    textInputAction: TextInputAction.done,
-                    onSubmitted: (value) {
-                      globalProvider.onChangeReview(value);
-                    },
-                    decoration: const InputDecoration(
-                      hintText: "Your Review",
-                      hintStyle: TextStyle(fontSize: 10),
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                      isDense: true,
-                      border: OutlineInputBorder(
-                        borderSide: BorderSide(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  /// Add
-                  ElevatedButton(
-                    onPressed: (globalProvider.nameController.text.isEmpty ||
-                            globalProvider.reviewController.text.isEmpty)
-                        ? null
-                        : () async {
-                            globalProvider.sendReview(context);
+                        /// close
+                        IconButton(
+                          onPressed: () {
                             Navigator.pop(context);
-                            setState(() {});
                             globalProvider.clear();
                           },
-                    child: const Text("Add"),
-                  )
-                ],
+                          icon: const Icon(Icons.close),
+                        ),
+                      ],
+                    ),
+
+                    /// Name
+                    const Text("Name"),
+                    const SizedBox(height: 5),
+                    TextField(
+                      autofocus: true,
+                      style: const TextStyle(fontSize: 10),
+                      controller: globalProvider.nameController,
+                      textCapitalization: TextCapitalization.sentences,
+                      textInputAction: TextInputAction.next,
+                      onSubmitted: (value) {
+                        globalProvider.onChangeName(value);
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Your Name",
+                        hintStyle: TextStyle(fontSize: 10),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        isDense: true,
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(),
+                        ),
+                      ),
+                    ),
+
+                    /// Review
+                    const SizedBox(height: 5),
+                    const Text("Review"),
+                    const SizedBox(height: 5),
+                    TextField(
+                      style: const TextStyle(fontSize: 10),
+                      controller: globalProvider.reviewController,
+                      maxLines: 3,
+                      textCapitalization: TextCapitalization.sentences,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (value) {
+                        globalProvider.onChangeReview(value);
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Your Review",
+                        hintStyle: TextStyle(fontSize: 10),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        isDense: true,
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    /// Add
+                    ElevatedButton(
+                      onPressed: (globalProvider.nameController.text.isEmpty ||
+                              globalProvider.reviewController.text.isEmpty)
+                          ? null
+                          : () async {
+                              globalProvider.sendReview(context);
+                              Navigator.pop(context);
+                              setState(() {});
+                              globalProvider.clear();
+                            },
+                      child: const Text("Add"),
+                    )
+                  ],
+                ),
               ),
             ),
           ),

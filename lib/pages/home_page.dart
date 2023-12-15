@@ -91,28 +91,28 @@ class _HomePageState extends State<HomePage> {
                       );
                     } else if (snapshot.hasError) {
                       return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.wifi_off_rounded),
-                      const SizedBox(height: 5),
-                      const Text('No connection'),
-                      const SizedBox(height: 5),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          surfaceTintColor: Colors.green,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.wifi_off_rounded),
+                            const SizedBox(height: 5),
+                            const Text('No connection'),
+                            const SizedBox(height: 5),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                surfaceTintColor: Colors.green,
+                              ),
+                              onPressed: () {
+                                setState(() {});
+                              },
+                              child: const Text(
+                                "refresh",
+                                style: TextStyle(color: primaryColor),
+                              ),
+                            )
+                          ],
                         ),
-                        onPressed: () {
-                          setState(() {});
-                        },
-                        child: const Text(
-                          "refresh",
-                          style: TextStyle(color: primaryColor),
-                        ),
-                      )
-                    ],
-                  ),
-                );
+                      );
                     } else if (!snapshot.hasData) {
                       return const Center(
                         child: Text('No data available'),
@@ -121,16 +121,18 @@ class _HomePageState extends State<HomePage> {
                         globalProvider.searchRestaurant.isEmpty) {
                       /// ketika tidak ada data saat search restaurant
                       return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.search_off_outlined,
-                              size: 54,
-                            ),
-                            SizedBox(height: 15),
-                            Text("data not found"),
-                          ],
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off_outlined,
+                                size: 54,
+                              ),
+                              SizedBox(height: 15),
+                              Text("data not found"),
+                            ],
+                          ),
                         ),
                       );
                     } else {
