@@ -53,13 +53,18 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 5),
                       const Text('No connection'),
                       const SizedBox(height: 5),
-
-                      /// refresh conection
                       ElevatedButton(
-                          onPressed: () {
-                            setState(() {});
-                          },
-                          child: const Text("refresh"))
+                        style: ElevatedButton.styleFrom(
+                          surfaceTintColor: Colors.green,
+                        ),
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        child: const Text(
+                          "refresh",
+                          style: TextStyle(color: primaryColor),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -86,21 +91,28 @@ class _HomePageState extends State<HomePage> {
                       );
                     } else if (snapshot.hasError) {
                       return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.wifi_off_rounded),
-                            const SizedBox(height: 5),
-                            const Text('No connection'),
-                            const SizedBox(height: 5),
-                            ElevatedButton(
-                                onPressed: () {
-                                  setState(() {});
-                                },
-                                child: const Text("refresh"))
-                          ],
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.wifi_off_rounded),
+                      const SizedBox(height: 5),
+                      const Text('No connection'),
+                      const SizedBox(height: 5),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          surfaceTintColor: Colors.green,
                         ),
-                      );
+                        onPressed: () {
+                          setState(() {});
+                        },
+                        child: const Text(
+                          "refresh",
+                          style: TextStyle(color: primaryColor),
+                        ),
+                      )
+                    ],
+                  ),
+                );
                     } else if (!snapshot.hasData) {
                       return const Center(
                         child: Text('No data available'),

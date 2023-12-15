@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primaryColor: primaryColor,
           textTheme: myTextTheme,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ).copyWith(
           pageTransitionsTheme: const PageTransitionsTheme(
