@@ -310,6 +310,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
           ),
           const SizedBox(height: 10),
           ListView.builder(
+            reverse: true,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             itemCount: globalProvider.detailrestaurant!.customerReviews.length,
@@ -366,7 +367,8 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                     style: const TextStyle(fontSize: 10),
                     controller: globalProvider.nameController,
                     textCapitalization: TextCapitalization.sentences,
-                    onChanged: (value) {
+                    textInputAction: TextInputAction.next,
+                    onSubmitted: (value) {
                       globalProvider.onChangeName(value);
                     },
                     decoration: const InputDecoration(
@@ -390,7 +392,8 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                     controller: globalProvider.reviewController,
                     maxLines: 3,
                     textCapitalization: TextCapitalization.sentences,
-                    onChanged: (value) {
+                    textInputAction: TextInputAction.done,
+                    onSubmitted: (value) {
                       globalProvider.onChangeReview(value);
                     },
                     decoration: const InputDecoration(
