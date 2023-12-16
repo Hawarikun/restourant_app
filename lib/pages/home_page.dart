@@ -68,7 +68,6 @@ class _HomePageState extends State<HomePage> {
             :
 
             /// pull to refresh
-
             RefreshIndicator(
                 onRefresh: () async {
                   Provider.of<GlobalProvider>(context, listen: false)
@@ -85,6 +84,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildList() {
     return Consumer<GlobalProvider>(
       builder: (context, state, _) {
+        /// check data loading
         if (state.state == ResultState.loading) {
           return Center(
             child: LoadingAnimationWidget.horizontalRotatingDots(
@@ -92,6 +92,8 @@ class _HomePageState extends State<HomePage> {
               size: 50,
             ),
           );
+
+          /// check data error
         } else if (state.state == ResultState.error) {
           return Center(
             child: Column(
@@ -117,6 +119,8 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           );
+
+          /// check data empty
         } else if (state.state == ResultState.noData) {
           return const Center(
             child: SingleChildScrollView(
@@ -133,10 +137,16 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           );
+
+          /// has data
         } else {
+          /// check data search restourant is empty
           if (state.searchRestaurant.isEmpty || state.searchValue == '') {
             return _restaurantListWidget(context, state);
+
+            /// check data search restourant is has data
           } else if (state.searchRestaurant.isNotEmpty) {
+            /// check data search restourant is loading
             if (state.state == ResultState.loading) {
               return Center(
                 child: LoadingAnimationWidget.horizontalRotatingDots(
@@ -144,6 +154,8 @@ class _HomePageState extends State<HomePage> {
                   size: 50,
                 ),
               );
+
+              /// check data search restourant is error
             } else if (state.state == ResultState.error) {
               return Center(
                 child: Column(
@@ -169,6 +181,8 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               );
+
+              /// check data search restourant is no data
             } else if (state.state == ResultState.noData) {
               return const Center(
                 child: SingleChildScrollView(
@@ -186,8 +200,11 @@ class _HomePageState extends State<HomePage> {
                 ),
               );
             } else {
+              /// check data search restourant is has data
               return _searchListWidget(state);
             }
+
+            /// check data search restourant is empty
           } else {
             /// ketika tidak ada data saat search restaurant
             return const Center(
@@ -294,7 +311,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
 
 /// corousel widget
 Widget _corouselSliderCostum(BuildContext context, List data) {
