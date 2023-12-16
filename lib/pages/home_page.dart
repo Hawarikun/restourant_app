@@ -11,7 +11,6 @@ import 'package:restourant_app/package/provider/global_provider.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
 import 'package:restourant_app/style/style.dart';
 
-/// use statefulwidget for refresh page with setState
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -22,10 +21,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    Provider.of<GlobalProvider>(context, listen: false).getSearchData(context);
-    Provider.of<GlobalProvider>(context, listen: false)
-        .fetchAndParseRestaurantList();
-
     return Consumer<GlobalProvider>(
       builder: (context, globalProvider, _) => Scaffold(
         appBar: EasySearchBar(
@@ -58,7 +53,8 @@ class _HomePageState extends State<HomePage> {
                           surfaceTintColor: Colors.green,
                         ),
                         onPressed: () {
-                          setState(() {});
+                          Provider.of<GlobalProvider>(context, listen: false)
+                              .fecthAllRestaurant();
                         },
                         child: const Text(
                           "refresh",
@@ -75,144 +71,232 @@ class _HomePageState extends State<HomePage> {
 
             RefreshIndicator(
                 onRefresh: () async {
-                  setState(() {});
+                  Provider.of<GlobalProvider>(context, listen: false)
+                      .fecthAllRestaurant();
                 },
 
                 /// Call Data Futere
-                child: FutureBuilder(
-                  future: globalProvider.searchRestaurantData,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: LoadingAnimationWidget.horizontalRotatingDots(
-                          color: primaryColor,
-                          size: 50,
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.wifi_off_rounded),
-                            const SizedBox(height: 5),
-                            const Text('No connection'),
-                            const SizedBox(height: 5),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                surfaceTintColor: Colors.green,
-                              ),
-                              onPressed: () {
-                                setState(() {});
-                              },
-                              child: const Text(
-                                "refresh",
-                                style: TextStyle(color: primaryColor),
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-                    } else if (!snapshot.hasData) {
-                      return const Center(
-                        child: Text('No data available'),
-                      );
-                    } else if (globalProvider.searchRestaurant == [] ||
-                        globalProvider.searchRestaurant.isEmpty) {
-                      /// ketika tidak ada data saat search restaurant
-                      return const Center(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.search_off_outlined,
-                                size: 54,
-                              ),
-                              SizedBox(height: 15),
-                              Text("data not found"),
-                            ],
-                          ),
-                        ),
-                      );
-                    } else {
-                      return SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ///  ketika searchValue kosong tampilkan
-                            if (globalProvider.searchValue.isEmpty)
-                              const Padding(
-                                padding: EdgeInsets.all(12),
-                                child: Text(
-                                  "Recommendation for you",
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
+                child: _buildList(),
+              ),
+      ),
+    );
+  }
 
-                            ///  ketika searchValue kosong tampilkan
-                            if (globalProvider.searchValue.isEmpty)
-                              _corouselSliderCostum(
-                                  context, globalProvider.byRating),
-
-                            ///  ketika searchValue kosong tampilkan
-                            if (globalProvider.searchValue.isEmpty)
-                              const Padding(
-                                padding: EdgeInsets.all(12.0),
-                                child: Text(
-                                  "Explore Restaurant",
-                                  style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-
-                            ///  ketika searchValue kosong ataupun tidak kosong tampilkan
-                            if (globalProvider.searchValue.isEmpty ||
-                                globalProvider.searchValue.isNotEmpty)
-                              AnimationLimiter(
-                                child: ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount:
-                                      globalProvider.searchRestaurant.length,
-                                  itemBuilder: (context, index) {
-                                    return AnimationConfiguration.staggeredList(
-                                      position: index,
-                                      duration:
-                                          const Duration(milliseconds: 800),
-                                      child: SlideAnimation(
-                                        verticalOffset: 100.0,
-                                        child: FadeInAnimation(
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12, vertical: 5),
-                                            child: _buildRestaurantItem(
-                                              context,
-                                              globalProvider
-                                                  .searchRestaurant[index],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    }
+  Widget _buildList() {
+    return Consumer<GlobalProvider>(
+      builder: (context, state, _) {
+        if (state.state == ResultState.loading) {
+          return Center(
+            child: LoadingAnimationWidget.horizontalRotatingDots(
+              color: primaryColor,
+              size: 50,
+            ),
+          );
+        } else if (state.state == ResultState.error) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.wifi_off_rounded),
+                const SizedBox(height: 5),
+                const Text('No connection'),
+                const SizedBox(height: 5),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    surfaceTintColor: Colors.green,
+                  ),
+                  onPressed: () {
+                    Provider.of<GlobalProvider>(context, listen: false)
+                        .fecthAllRestaurant();
                   },
+                  child: const Text(
+                    "refresh",
+                    style: TextStyle(color: primaryColor),
+                  ),
+                )
+              ],
+            ),
+          );
+        } else if (state.state == ResultState.noData) {
+          return const Center(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.search_off_outlined,
+                    size: 54,
+                  ),
+                  SizedBox(height: 15),
+                  Text("data not found"),
+                ],
+              ),
+            ),
+          );
+        } else {
+          if (state.searchRestaurant.isEmpty || state.searchValue == '') {
+            return _restaurantListWidget(context, state);
+          } else if (state.searchRestaurant.isNotEmpty) {
+            if (state.state == ResultState.loading) {
+              return Center(
+                child: LoadingAnimationWidget.horizontalRotatingDots(
+                  color: primaryColor,
+                  size: 50,
+                ),
+              );
+            } else if (state.state == ResultState.error) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.wifi_off_rounded),
+                    const SizedBox(height: 5),
+                    const Text('No connection'),
+                    const SizedBox(height: 5),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        surfaceTintColor: Colors.green,
+                      ),
+                      onPressed: () {
+                        Provider.of<GlobalProvider>(context, listen: false)
+                            .fecthAllRestaurant();
+                      },
+                      child: const Text(
+                        "refresh",
+                        style: TextStyle(color: primaryColor),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            } else if (state.state == ResultState.noData) {
+              return const Center(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search_off_outlined,
+                        size: 54,
+                      ),
+                      SizedBox(height: 15),
+                      Text("data not found"),
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return _searchListWidget(state);
+            }
+          } else {
+            /// ketika tidak ada data saat search restaurant
+            return const Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.search_off_outlined,
+                      size: 54,
+                    ),
+                    SizedBox(height: 15),
+                    Text("data not found"),
+                  ],
                 ),
               ),
+            );
+          }
+        }
+      },
+    );
+  }
+
+  /// untuk menampilkan list hasil search
+  AnimationLimiter _searchListWidget(GlobalProvider state) {
+    return AnimationLimiter(
+      child: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: state.searchRestaurant.length,
+        itemBuilder: (context, index) {
+          return AnimationConfiguration.staggeredList(
+            position: index,
+            duration: const Duration(milliseconds: 800),
+            child: SlideAnimation(
+              verticalOffset: 100.0,
+              child: FadeInAnimation(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  child: _buildRestaurantItem(
+                    context,
+                    state.searchRestaurant[index],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// untuk menampilkan list restaurant
+  SingleChildScrollView _restaurantListWidget(
+      BuildContext context, GlobalProvider state) {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(12),
+            child: Text(
+              "Recommendation for you",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+          _corouselSliderCostum(context, state.byRating),
+          const Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Text(
+              "Explore Restaurant",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+          ),
+          AnimationLimiter(
+            child: ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: state.restaurantList.length,
+              itemBuilder: (context, index) {
+                return AnimationConfiguration.staggeredList(
+                  position: index,
+                  duration: const Duration(milliseconds: 800),
+                  child: SlideAnimation(
+                    verticalOffset: 100.0,
+                    child: FadeInAnimation(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 5),
+                        child: _buildRestaurantItem(
+                          context,
+                          state.restaurantList[index],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
+
+/// corousel widget
 Widget _corouselSliderCostum(BuildContext context, List data) {
   final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
 

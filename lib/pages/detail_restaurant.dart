@@ -24,113 +24,128 @@ class RestaurantDetail extends StatefulWidget {
 
 class _RestaurantDetailState extends State<RestaurantDetail> {
   @override
+  void initState() {
+    context.read<GlobalProvider>().getData(context);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
-    Provider.of<GlobalProvider>(context, listen: false).getData(context);
+    return Consumer<GlobalProvider>(
+      builder: (context, globalProvider, _) => CustomScaffold(
+        restaurant: widget.restaurant,
+        body: _buildList(),
+      ),
+    );
+  }
 
-    /// check conection
-    return globalProvider.connectionStatus == ConnectivityResult.none
-        ? Scaffold(
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.wifi_off_rounded),
-                  const SizedBox(height: 5),
-                  const Text('No connection'),
-                  const SizedBox(height: 5),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      surfaceTintColor: Colors.green,
-                    ),
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    child: const Text(
-                      "refresh",
-                      style: TextStyle(color: primaryColor),
-                    ),
-                  )
-                ],
-              ),
+  Widget _buildList() {
+    return Consumer<GlobalProvider>(
+      builder: (context, state, _) {
+        if (state.state == ResultState.loading) {
+          return Center(
+            child: LoadingAnimationWidget.horizontalRotatingDots(
+              color: primaryColor,
+              size: 50,
             ),
-          )
-        : CustomScaffold(
-            restaurant: widget.restaurant,
+          );
+        } else if (state.state == ResultState.error) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.wifi_off_rounded),
+                const SizedBox(height: 5),
+                const Text('No connection'),
+                const SizedBox(height: 5),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    surfaceTintColor: Colors.green,
+                  ),
+                  onPressed: () {
+                    Provider.of<GlobalProvider>(context, listen: false)
+                        .getData(context);
+                  },
+                  child: const Text(
+                    "refresh",
+                    style: TextStyle(color: primaryColor),
+                  ),
+                )
+              ],
+            ),
+          );
+        } else if (state.state == ResultState.noData ||
+            state.detailrestaurant == null) {
+          return const Center(
+            child: Text('No data available'),
+          );
+        } else {
+          return
 
-            /// get detail retaurant from future
-            body: FutureBuilder(
-              future: Future.delayed(const Duration(seconds: 2),
-                  () => globalProvider.detailRestaurantData),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                    child: LoadingAnimationWidget.horizontalRotatingDots(
-                      color: primaryColor,
-                      size: 50,
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.wifi_off_rounded),
-                        const SizedBox(height: 5),
-                        const Text('No connection'),
-                        const SizedBox(height: 5),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            surfaceTintColor: Colors.green,
-                          ),
-                          onPressed: () {
-                            setState(() {});
-                          },
-                          child: const Text(
-                            "refresh",
-                            style: TextStyle(color: primaryColor),
-                          ),
-                        )
-                      ],
-                    ),
-                  );
-                } else if (!snapshot.hasData) {
-                  return const Center(
-                    child: Text('No data available'),
-                  );
-                } else {
-                  return NestedScrollView(
-                    headerSliverBuilder: (context, isScrolled) {
-                      return [
-                        SliverAppBar(
-                          expandedHeight: 200,
-                          flexibleSpace: FlexibleSpaceBar(
-                            background: Hero(
-                              transitionOnUserGestures: false,
-                              tag: widget.restaurant.pictureId,
-                              child: Image.network(
-                                "https://restaurant-api.dicoding.dev/images/large/${widget.restaurant.pictureId}",
-                                fit: BoxFit.fitWidth,
-                                errorBuilder: (ctx, error, _) =>
-                                    const Center(child: Icon(Icons.error)),
+              /// check conection
+              state.connectionStatus == ConnectivityResult.none
+                  ? Scaffold(
+                      body: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.wifi_off_rounded),
+                            const SizedBox(height: 5),
+                            const Text('No connection'),
+                            const SizedBox(height: 5),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                surfaceTintColor: Colors.green,
+                              ),
+                              onPressed: () {
+                                Provider.of<GlobalProvider>(context,
+                                        listen: false)
+                                    .getData(context);
+                              },
+                              child: const Text(
+                                "refresh",
+                                style: TextStyle(color: primaryColor),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  : NestedScrollView(
+                      headerSliverBuilder: (context, isScrolled) {
+                        return [
+                          SliverAppBar(
+                            expandedHeight: 200,
+                            flexibleSpace: FlexibleSpaceBar(
+                              background: Hero(
+                                transitionOnUserGestures: false,
+                                tag: widget.restaurant.pictureId,
+                                child: Image.network(
+                                  "https://restaurant-api.dicoding.dev/images/large/${widget.restaurant.pictureId}",
+                                  fit: BoxFit.fitWidth,
+                                  errorBuilder: (ctx, error, _) =>
+                                      const Center(child: Icon(Icons.error)),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ];
-                    },
+                        ];
+                      },
 
-                    /// pull to refresh
-                    body: RefreshIndicator(
-                        onRefresh: () async {
-                          setState(() {});
-                        },
-                        child: _bodyDetailRestourant(context, globalProvider)),
-                  );
-                }
-              },
-            ),
-          );
+                      // body: const SizedBox(),
+
+                      /// pull to refresh
+                      body: RefreshIndicator(
+                          onRefresh: () async {
+                            Provider.of<GlobalProvider>(context, listen: false)
+                                .getData(context);
+                          },
+                          // child: const SizedBox(),
+                          child: _bodyDetailRestourant(context, state)),
+                    );
+        }
+      },
+    );
   }
 
   SingleChildScrollView _bodyDetailRestourant(
@@ -434,8 +449,10 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                           : () async {
                               globalProvider.sendReview(context);
                               Navigator.pop(context);
-                              setState(() {});
                               globalProvider.clear();
+                              Provider.of<GlobalProvider>(context,
+                                      listen: false)
+                                  .getData(context);
                             },
                       child: const Text("Add"),
                     )

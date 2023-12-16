@@ -75,33 +75,29 @@ class ApiService {
   Future<void> addReview(BuildContext context) async {
     final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
 
-    try {
-      var body = {
-        'id': globalProvider.detailRestaurantId,
-        'name': globalProvider.nameController.text,
-        'review': globalProvider.reviewController.text
-      };
+    var body = {
+      'id': globalProvider.detailRestaurantId,
+      'name': globalProvider.nameController.text,
+      'review': globalProvider.reviewController.text
+    };
 
-      final response = await http.post(
-        Uri.parse(
-          "$_baseUrl/review",
-        ),
-        headers: <String, String>{
-          _type: _header,
-        },
-        body: jsonEncode(body),
-      );
+    final response = await http.post(
+      Uri.parse(
+        "$_baseUrl/review",
+      ),
+      headers: <String, String>{
+        _type: _header,
+      },
+      body: jsonEncode(body),
+    );
 
-      if (response.statusCode == 200) {
-        /// Berhasil, respon dari server
-        print('Response: ${response.body}');
-      } else {
-        /// Gagal, respon error dari server
-        print('Error: ${response.statusCode}, ${response.body}');
-      }
-    } catch (error) {
-      /// Tangani kesalahan koneksi atau lainnya
-      print('Error: $error');
+    if (response.statusCode >= 200) {
+      /// Berhasil, respon dari server
+      print('Response: ${response.body}');
+    } else {
+      /// Gagal, respon error dari server
+      throw Exception(
+          'Failed to load restaurants, status code: ${response.statusCode}');
     }
   }
 }

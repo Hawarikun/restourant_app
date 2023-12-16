@@ -3,45 +3,55 @@ import 'package:flutter/material.dart';
 import 'package:restourant_app/data/api/api_service.dart';
 import 'package:restourant_app/data/model/restaurant.dart';
 
+enum ResultState { loading, noData, hasData, error }
+
 class GlobalProvider extends ChangeNotifier {
+  final ApiService apiService;
+
+  GlobalProvider({required this.apiService, required BuildContext context}) {
+    fecthAllRestaurant();
+    initConnectivity();
+    _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  }
+
   /// name reviewer
   final TextEditingController _nameController = TextEditingController();
 
   /// review
   final TextEditingController _reviewController = TextEditingController();
 
-  /// detail restaurant data from api
-  late Future<DetailRestaurant> _detailRestaurantData;
+  /// ResultState
+  late ResultState _state;
 
-  /// search restaurant data from api
-  late Future<List<Restaurant>> searchRestaurantData;
-
-  /// all restaurant data from api
-  late Future<List<Restaurant>> restaurant;
-
+  /// detail restaurant
   DetailRestaurant? _detailRestaurant;
 
+  /// list hasil search
   List<Restaurant> _searchRestaurant = [];
+
   /// restaurant List
-  List<Restaurant> restaurantList = [];
+  List<Restaurant> _restaurantList = [];
 
   /// Restaurant by rating
   List<Restaurant> byRating = [];
 
   /// id for add reviews
   String _detailRestaurantId = "";
-  
+
   /// search value
   String _searchValue = "";
 
   /// get
+  ResultState get state => _state;
+
   TextEditingController get nameController => _nameController;
   TextEditingController get reviewController => _reviewController;
 
-  Future<DetailRestaurant> get detailRestaurantData => _detailRestaurantData;
+  // Future<DetailRestaurant> get detailRestaurantData => _detailRestaurantData;
 
   DetailRestaurant? get detailrestaurant => _detailRestaurant;
 
+  List<Restaurant> get restaurantList => _restaurantList;
   List<Restaurant> get searchRestaurant => _searchRestaurant;
 
   String get detailRestaurantId => _detailRestaurantId;
@@ -75,56 +85,86 @@ class GlobalProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void refresh() {
+    notifyListeners();
+  }
+
   /// get list data restourant from api
-  Future fetchAndParseRestaurantList() async {
+  Future fecthAllRestaurant() async {
     try {
-      restaurant = ApiService().getAllRestaurant();
-
-      restaurantList = await restaurant;
-
-      List<Restaurant> sortByRating = List.from(restaurantList);
-      sortByRating.sort((a, b) => b.rating.compareTo(a.rating));
-
-      List<Restaurant> top5Restaurants = sortByRating.take(5).toList();
-
-      restaurantList;
-      byRating = top5Restaurants;
-
+      _state = ResultState.loading;
       notifyListeners();
+
+      final restaurant = await ApiService().getAllRestaurant();
+
+      if (restaurant.isEmpty) {
+        _state = ResultState.noData;
+        notifyListeners();
+      } else {
+        _state = ResultState.hasData;
+        _restaurantList = restaurant;
+
+        List<Restaurant> sortByRating = List.from(_restaurantList);
+        sortByRating.sort((a, b) => b.rating.compareTo(a.rating));
+
+        List<Restaurant> top5Restaurants = sortByRating.take(5).toList();
+
+        _restaurantList;
+        byRating = top5Restaurants;
+
+        notifyListeners();
+      }
     } catch (error) {
-      print("e : $error");
+      _state = ResultState.error;
+      notifyListeners();
     }
   }
 
   /// get detail data restaurant from api
-  Future<void> getData(BuildContext context) async {
+  Future getData(BuildContext context) async {
     try {
-      _detailRestaurantData = ApiService().getDetailRestaurant(context);
+      _state = ResultState.loading;
 
-      _detailRestaurant = await _detailRestaurantData;
+      final detailRestaurantData =
+          await ApiService().getDetailRestaurant(context);
 
+      _state = ResultState.hasData;
+      _detailRestaurant = detailRestaurantData;
+      // print('done');
       notifyListeners();
     } catch (error) {
-      print("Error fetching data: $error");
+      _state = ResultState.error;
+      notifyListeners();
     }
   }
 
-  /// get data restourant by search from api 
-  Future<void> getSearchData(BuildContext context) async {
+  /// get data restourant by search from api
+  Future getSearchData(BuildContext context) async {
     try {
-      searchRestaurantData = ApiService().searchRestaurant(context);
-
-      _searchRestaurant = await searchRestaurantData;
-
+      _state = ResultState.loading;
       notifyListeners();
+
+      final searchRestaurantData = await ApiService().searchRestaurant(context);
+
+      if (searchRestaurantData.isEmpty) {
+        _state = ResultState.noData;
+        notifyListeners();
+      } else {
+        _state = ResultState.hasData;
+        _searchRestaurant = searchRestaurantData;
+        notifyListeners();
+      }
     } catch (error) {
-      print("Error fetching data: $error");
+      _state = ResultState.error;
+      notifyListeners();
     }
   }
 
   /// send data review to api
   Future sendReview(BuildContext context) async {
     await ApiService().addReview(context);
+
+    notifyListeners();
   }
 
   /// clear variable for add review
@@ -140,11 +180,6 @@ class GlobalProvider extends ChangeNotifier {
   final Connectivity _connectivity = Connectivity();
 
   ConnectivityResult get connectionStatus => _connectionStatus;
-
-  GlobalProvider() {
-    initConnectivity();
-    _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
-  }
 
   Future<void> initConnectivity() async {
     try {
@@ -163,5 +198,6 @@ class GlobalProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   ///
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:provider/provider.dart';
+import 'package:restourant_app/data/api/api_service.dart';
 
 import 'package:restourant_app/data/model/restaurant.dart';
 import 'package:restourant_app/package/provider/global_provider.dart';
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => GlobalProvider(),
+      create: (context) =>
+          GlobalProvider(apiService: ApiService(), context: context),
       child: MaterialApp(
         title: 'Dicoding - Restaurant_App',
         debugShowCheckedModeBanner: false,
