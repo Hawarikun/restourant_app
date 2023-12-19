@@ -6,8 +6,8 @@ class CustomScaffold extends StatelessWidget {
   final Restaurant restaurant;
   final Widget body;
 
-  const CustomScaffold({Key? key, required this.body, required this.restaurant})
-      : super(key: key);
+  const CustomScaffold(
+      {super.key, required this.body, required this.restaurant});
 
   @override
   Widget build(BuildContext context) {

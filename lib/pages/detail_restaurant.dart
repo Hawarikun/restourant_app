@@ -5,9 +5,11 @@ import 'package:provider/provider.dart';
 import 'package:readmore/readmore.dart';
 
 import 'package:restourant_app/data/model/restaurant.dart';
+import 'package:restourant_app/package/provider/database_provider.dart';
 import 'package:restourant_app/package/provider/global_provider.dart';
+import 'package:restourant_app/package/utils/result_state.dart';
 import 'package:restourant_app/package/widget/costum_scaffold.dart';
-import 'package:restourant_app/style/style.dart';
+import 'package:restourant_app/common/style.dart';
 
 /// use statefulwidget for refresh page with setState
 class RestaurantDetail extends StatefulWidget {
@@ -15,8 +17,7 @@ class RestaurantDetail extends StatefulWidget {
 
   final Restaurant restaurant;
 
-  const RestaurantDetail({Key? key, required this.restaurant})
-      : super(key: key);
+  const RestaurantDetail({super.key, required this.restaurant});
 
   @override
   State<RestaurantDetail> createState() => _RestaurantDetailState();
@@ -136,12 +137,22 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
 
                       /// pull to refresh
                       body: RefreshIndicator(
-                          onRefresh: () async {
-                            Provider.of<GlobalProvider>(context, listen: false)
-                                .getData(context);
-                          },
-                          // child: const SizedBox(),
-                          child: _bodyDetailRestourant(context, state)),
+                        onRefresh: () async {
+                          Provider.of<GlobalProvider>(context, listen: false)
+                              .getData(context);
+                        },
+                        // child: const SizedBox(),
+                        child: Consumer<DatabaseProvider>(
+                          builder: (context, provider, child) => FutureBuilder(
+                            future: provider.isBookmarked(widget.restaurant.id),
+                            builder: (context, snapshot) {
+                              var isBookmarked = snapshot.data ?? false;
+                              return _bodyDetailRestourant(
+                                  context, isBookmarked);
+                            },
+                          ),
+                        ),
+                      ),
                     );
         }
       },
@@ -149,208 +160,238 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
   }
 
   SingleChildScrollView _bodyDetailRestourant(
-      BuildContext context, GlobalProvider globalProvider) {
+      BuildContext context, bool isBookmarked) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// restaurant name
-          Text(
-            widget.restaurant.name,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+      child: Consumer2<GlobalProvider, DatabaseProvider>(
+        builder: (context, provider, databaseProvider, _) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// restaurant name & bookmark
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  widget.restaurant.name,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
 
-          const SizedBox(
-            height: 5,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              /// restaurant location
-              Expanded(
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
+                /// bookmark
+                Card(
+                  surfaceTintColor: Colors.white,
+                  elevation: 3,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25)),
+                  // decoration: BoxDecoration(
+                  //   border: Border.all(width: 1, color: Colors.grey.shade400),
+                  // ),
+                  child: isBookmarked
+                      ? IconButton(
+                          icon: const Icon(Icons.favorite),
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () => databaseProvider
+                              .removeBookmark(widget.restaurant.id),
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.favorite_border),
+                          color: Theme.of(context).primaryColor,
+                          onPressed: () =>
+                              databaseProvider.addBookmark(widget.restaurant),
+                        ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 5),
+
+            /// rating
+
+            Row(
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: List.generate(5, (index) {
+                    return Icon(
+                      index < widget.restaurant.rating.round()
+                          ? Icons.star
+                          : Icons.star_border,
                       size: 16,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      "${globalProvider.detailrestaurant!.address}, ${widget.restaurant.city}",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-
-              /// rating
-              Row(
-                children: [
-                  const Icon(
-                    Icons.star,
-                    size: 16,
-                    color: starColor,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    widget.restaurant.rating.toString(),
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                ],
-              ),
-            ],
-          ),
-
-          /// category
-          Row(
-            // mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text("category : "),
-              SizedBox(
-                height: 35,
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  itemCount: globalProvider.detailrestaurant!.categories.length,
-                  itemBuilder: (context, index) {
-                    final data =
-                        globalProvider.detailrestaurant!.categories[index];
-                    return Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(5.0),
-                        child: Text(data.name),
-                      ),
+                      color: starColor,
                     );
-                  },
+                  }),
                 ),
-              )
-            ],
-          ),
-
-          /// description
-          const SizedBox(height: 18),
-          const Divider(),
-          const SizedBox(height: 12),
-          const Text(
-            "Description",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 12),
-          ReadMoreText(
-            widget.restaurant.description,
-            textAlign: TextAlign.justify,
-            trimLines: 6,
-            trimMode: TrimMode.Line,
-            colorClickableText: Colors.green,
-            trimCollapsedText: "Show More",
-            trimExpandedText: '\nShow less',
-            moreStyle: const TextStyle(
-                fontSize: 14, fontWeight: FontWeight.bold, color: primaryColor),
-            lessStyle: const TextStyle(
-                fontSize: 14, fontWeight: FontWeight.bold, color: primaryColor),
-          ),
-
-          const SizedBox(height: 12),
-          const Divider(),
-
-          /// Food menus
-          const SizedBox(height: 18),
-          const Text(
-            "Foods Menu",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+                const SizedBox(width: 5),
+                Text(
+                  widget.restaurant.rating.toString(),
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 200,
 
-            /// call Foods menu
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: globalProvider.detailrestaurant!.menus.foods.length,
-              itemBuilder: (context, index) {
-                final data =
-                    globalProvider.detailrestaurant!.menus.foods[index];
-
-                /// card food menus content
-                return _contentMenus(data.name, 'assets/images/food.jpeg');
-              },
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                const Icon(
+                  Icons.location_on,
+                  size: 16,
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  "${provider.detailrestaurant!.address}, ${widget.restaurant.city}",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
             ),
-          ),
 
-          /// Drink menus
-          const SizedBox(height: 18),
-          const Text(
-            "Drinks Menu",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+            /// category
+            Row(
+              children: [
+                const Text("category : "),
+                SizedBox(
+                  height: 35,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: provider.detailrestaurant!.categories.length,
+                    itemBuilder: (context, index) {
+                      final data = provider.detailrestaurant!.categories[index];
+                      return Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: Text(data.name),
+                        ),
+                      );
+                    },
+                  ),
+                )
+              ],
             ),
-          ),
-          const SizedBox(height: 10),
-          SizedBox(
-            height: 200,
 
-            /// call Foods menu
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: globalProvider.detailrestaurant!.menus.drinks.length,
-              itemBuilder: (context, index) {
-                final data =
-                    globalProvider.detailrestaurant!.menus.drinks[index];
-
-                /// card food menus content
-                return _contentMenus(
-                    data.name, 'assets/images/orange_jus.jpeg');
-              },
+            /// description
+            const SizedBox(height: 18),
+            const Divider(),
+            const SizedBox(height: 12),
+            const Text(
+              "Description",
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(height: 18),
-          const Divider(),
-          const SizedBox(height: 18),
-
-          /// Costumer Review
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Costumer Reviews",
-                style: TextStyle(
-                  fontSize: 16,
+            const SizedBox(height: 12),
+            ReadMoreText(
+              widget.restaurant.description,
+              textAlign: TextAlign.justify,
+              trimLines: 6,
+              trimMode: TrimMode.Line,
+              colorClickableText: Colors.green,
+              trimCollapsedText: "Show More",
+              trimExpandedText: '\nShow less',
+              moreStyle: const TextStyle(
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
-                ),
+                  color: primaryColor),
+              lessStyle: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor),
+            ),
+
+            const SizedBox(height: 12),
+            const Divider(),
+
+            /// Food menus
+            const SizedBox(height: 18),
+            const Text(
+              "Foods Menu",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
-              IconButton(
-                onPressed: () {
-                  _showAddReview(context);
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 200,
+
+              /// call Foods menu
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: provider.detailrestaurant!.menus.foods.length,
+                itemBuilder: (context, index) {
+                  final data = provider.detailrestaurant!.menus.foods[index];
+
+                  /// card food menus content
+                  return _contentMenus(data.name, 'assets/images/food.jpeg');
                 },
-                icon: const Icon(Icons.add),
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          ListView.builder(
-            reverse: true,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: globalProvider.detailrestaurant!.customerReviews.length,
-            itemBuilder: (contex, index) {
-              final data =
-                  globalProvider.detailrestaurant!.customerReviews[index];
-              return _reviewCard(data);
-            },
-          )
-        ],
+            ),
+
+            /// Drink menus
+            const SizedBox(height: 18),
+            const Text(
+              "Drinks Menu",
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 200,
+
+              /// call Foods menu
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: provider.detailrestaurant!.menus.drinks.length,
+                itemBuilder: (context, index) {
+                  final data = provider.detailrestaurant!.menus.drinks[index];
+
+                  /// card food menus content
+                  return _contentMenus(
+                      data.name, 'assets/images/orange_jus.jpeg');
+                },
+              ),
+            ),
+            const SizedBox(height: 18),
+            const Divider(),
+            const SizedBox(height: 18),
+
+            /// Costumer Review
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "Costumer Reviews",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    _showAddReview(context);
+                  },
+                  icon: const Icon(Icons.add),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ListView.builder(
+              reverse: true,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: provider.detailrestaurant!.customerReviews.length,
+              itemBuilder: (contex, index) {
+                final data = provider.detailrestaurant!.customerReviews[index];
+                return _reviewCard(data);
+              },
+            )
+          ],
+        ),
       ),
     );
   }

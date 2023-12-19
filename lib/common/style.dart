@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const primaryColor = Color.fromRGBO(46, 204, 113, 0.5);
+const primaryColor = Color.fromRGBO(46, 204, 113, 1);
 
 const starColor = Color.fromRGBO(234, 153, 39, 1);
 

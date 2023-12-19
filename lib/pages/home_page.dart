@@ -8,8 +8,9 @@ import 'package:provider/provider.dart';
 
 import 'package:restourant_app/data/model/restaurant.dart';
 import 'package:restourant_app/package/provider/global_provider.dart';
+import 'package:restourant_app/package/utils/result_state.dart';
 import 'package:restourant_app/pages/detail_restaurant.dart';
-import 'package:restourant_app/style/style.dart';
+import 'package:restourant_app/common/style.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

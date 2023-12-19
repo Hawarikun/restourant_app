@@ -2,8 +2,9 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:restourant_app/data/api/api_service.dart';
 import 'package:restourant_app/data/model/restaurant.dart';
+import 'package:restourant_app/package/utils/result_state.dart';
 
-enum ResultState { loading, noData, hasData, error }
+
 
 class GlobalProvider extends ChangeNotifier {
   final ApiService apiService;
@@ -13,6 +14,9 @@ class GlobalProvider extends ChangeNotifier {
     initConnectivity();
     _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
   }
+
+  /// current index for bottom navbar
+  int _currentIndex = 0;
 
   /// name reviewer
   final TextEditingController _nameController = TextEditingController();
@@ -54,8 +58,16 @@ class GlobalProvider extends ChangeNotifier {
   List<Restaurant> get restaurantList => _restaurantList;
   List<Restaurant> get searchRestaurant => _searchRestaurant;
 
+  int get currentIndex => _currentIndex;
   String get detailRestaurantId => _detailRestaurantId;
   String get searchValue => _searchValue;
+
+  /// set index
+  void setCurrentIndex(int index) {
+    _currentIndex = index;
+
+    notifyListeners();
+  }
 
   /// set id
   void setDetailRestaurantID(String id) {
