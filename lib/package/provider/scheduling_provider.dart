@@ -25,8 +25,6 @@ class SchedulingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  
-
   Future<bool> scheduledNews(bool value) async {
     _isScheduled = value;
     await saveScheduledStatus(value);

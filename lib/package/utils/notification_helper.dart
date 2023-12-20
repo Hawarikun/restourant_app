@@ -64,30 +64,37 @@ class NotificationHelper {
         android: androidPlatformChannelSpecifics,
         iOS: iOSPlatformChannelSpecifics);
 
+    /// Generate a random integer between restaurant lenght
+    Random random = Random();
+
+    int randomIndex = random.nextInt(restaurant.length);
+    ///
+
+    /// get random restaurant
+    var payload = restaurant[randomIndex];
+
     var titleNotification = "<b>Recomended for you</b>";
+    var titleNews = payload.name;
 
-    var titleNews = restaurant[0].name;
-
-    List<Map<String, dynamic>> jsonList =
-        restaurant.map((restaurant) => restaurant.toJson()).toList();
-
+    /// show notification and set payload
     await flutterLocalNotificationsPlugin.show(
         0, titleNotification, titleNews, platformChannelSpecifics,
-        payload: json.encode(jsonList));
+        payload: json.encode(payload));
   }
 
   void configureSelectNotificationSubject(BuildContext context, String route) {
     selectNotificationSubject.stream.listen(
+
+      /// get payload
       (String payload) async {
-        List<dynamic> jsonData = json.decode(payload);
-        List<Restaurant> data =
-            jsonData.map((item) => Restaurant.fromJson(item)).toList();
-        var restaurant = data[0];
+        dynamic jsonData = json.decode(payload);
+        Restaurant data = Restaurant.fromJson(jsonData);
+        var restaurant = data;
 
         // Accessing another provider
         var provider = Provider.of<GlobalProvider>(context, listen: false);
         provider.setDetailRestaurantID(restaurant.id);
-
+        
         Navigation.intentWithData(context, route, restaurant);
       },
     );

@@ -283,6 +283,7 @@ class _HomePageState extends State<HomePage> {
           ),
           AnimationLimiter(
             child: ListView.builder(
+              key: const Key("K"),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: state.restaurantList.length,
