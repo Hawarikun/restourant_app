@@ -263,6 +263,7 @@ class _HomePageState extends State<HomePage> {
   SingleChildScrollView _restaurantListWidget(
       BuildContext context, GlobalProvider state) {
     return SingleChildScrollView(
+      key: const Key("Scrollable"),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -19,6 +19,7 @@ class SettingPage extends StatelessWidget {
             trailing: Consumer<SchedulingProvider>(
               builder: (context, scheduled, _) {
                 return Switch.adaptive(
+                  key: const Key("Switch"),
                   value: scheduled.isScheduled,
                   onChanged: (value) async {
                     if (Platform.isIOS) {
