@@ -18,7 +18,6 @@ class SettingPage extends StatelessWidget {
             title: const Text('Scheduling News'),
             trailing: Consumer<SchedulingProvider>(
               builder: (context, scheduled, _) {
-                print(scheduled.isScheduled);
                 return Switch.adaptive(
                   value: scheduled.isScheduled,
                   onChanged: (value) async {
