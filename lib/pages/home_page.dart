@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
     return Consumer<GlobalProvider>(
       builder: (context, globalProvider, _) => Scaffold(
         appBar: EasySearchBar(
+          key: const Key("searchBar"),
           title: const Text(
             "Restaurant",
             style: TextStyle(
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
           searchHintText: "search restourant",
           onSearch: (value) {
             globalProvider.setSearchValue(value);
-            globalProvider.getSearchData(context);
+            globalProvider.getSearchData();
           },
         ),
         body: globalProvider.connectionStatus == ConnectivityResult.none
@@ -263,7 +264,6 @@ class _HomePageState extends State<HomePage> {
   SingleChildScrollView _restaurantListWidget(
       BuildContext context, GlobalProvider state) {
     return SingleChildScrollView(
-      key: const Key("Scrollable"),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -284,7 +284,6 @@ class _HomePageState extends State<HomePage> {
           ),
           AnimationLimiter(
             child: ListView.builder(
-              key: const Key("K"),
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: state.restaurantList.length,

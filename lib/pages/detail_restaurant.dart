@@ -26,7 +26,7 @@ class RestaurantDetail extends StatefulWidget {
 class _RestaurantDetailState extends State<RestaurantDetail> {
   @override
   void initState() {
-    context.read<GlobalProvider>().getData(context);
+    context.read<GlobalProvider>().getData();
     super.initState();
   }
 
@@ -40,7 +40,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
     );
   }
 
-  Widget _buildList() {
+   Widget _buildList() {
     return Consumer<GlobalProvider>(
       builder: (context, state, _) {
         if (state.state == ResultState.loading) {
@@ -65,7 +65,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                   ),
                   onPressed: () {
                     Provider.of<GlobalProvider>(context, listen: false)
-                        .getData(context);
+                        .getData();
                   },
                   child: const Text(
                     "refresh",
@@ -101,7 +101,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                               onPressed: () {
                                 Provider.of<GlobalProvider>(context,
                                         listen: false)
-                                    .getData(context);
+                                    .getData();
                               },
                               child: const Text(
                                 "refresh",
@@ -139,7 +139,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                       body: RefreshIndicator(
                         onRefresh: () async {
                           Provider.of<GlobalProvider>(context, listen: false)
-                              .getData(context);
+                              .getData();
                         },
                         // child: const SizedBox(),
                         child: Consumer<DatabaseProvider>(
@@ -161,6 +161,7 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
 
   SingleChildScrollView _bodyDetailRestourant(
       BuildContext context, bool isBookmarked) {
+    final size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       child: Consumer2<GlobalProvider, DatabaseProvider>(
@@ -380,15 +381,17 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
               ],
             ),
             const SizedBox(height: 10),
-            ListView.builder(
-              reverse: true,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: provider.detailrestaurant!.customerReviews.length,
-              itemBuilder: (contex, index) {
-                final data = provider.detailrestaurant!.customerReviews[index];
-                return _reviewCard(data);
-              },
+            SizedBox(
+              height: size.height * 0.4,
+              child: ListView.builder(
+                reverse: true,
+                itemCount: provider.detailrestaurant!.customerReviews.length,
+                itemBuilder: (contex, index) {
+                  final data =
+                      provider.detailrestaurant!.customerReviews[index];
+                  return _reviewCard(data);
+                },
+              ),
             )
           ],
         ),
@@ -488,12 +491,12 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                               globalProvider.reviewController.text.isEmpty)
                           ? null
                           : () async {
-                              globalProvider.sendReview(context);
+                              globalProvider.sendReview();
                               Navigator.pop(context);
                               globalProvider.clear();
                               Provider.of<GlobalProvider>(context,
                                       listen: false)
-                                  .getData(context);
+                                  .getData();
                             },
                       child: const Text("Add"),
                     )
@@ -527,19 +530,22 @@ class _RestaurantDetailState extends State<RestaurantDetail> {
                 const SizedBox(width: 10),
 
                 /// name and date
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      data.name,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 12),
-                    ),
-                    Text(
-                      data.date,
-                      style: const TextStyle(fontSize: 10, color: Colors.grey),
-                    ),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        data.name,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                      Text(
+                        data.date,
+                        style:
+                            const TextStyle(fontSize: 10, color: Colors.grey),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),

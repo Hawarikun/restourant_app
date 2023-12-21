@@ -133,12 +133,12 @@ class GlobalProvider extends ChangeNotifier {
   }
 
   /// get detail data restaurant from api
-  Future getData(BuildContext context) async {
+  Future getData() async {
     try {
       _state = ResultState.loading;
 
       final detailRestaurantData =
-          await ApiService().getDetailRestaurant(context);
+          await ApiService().getDetailRestaurant(detailRestaurantId);
 
       _state = ResultState.hasData;
       _detailRestaurant = detailRestaurantData;
@@ -151,12 +151,12 @@ class GlobalProvider extends ChangeNotifier {
   }
 
   /// get data restourant by search from api
-  Future getSearchData(BuildContext context) async {
+  Future getSearchData() async {
     try {
       _state = ResultState.loading;
       notifyListeners();
 
-      final searchRestaurantData = await ApiService().searchRestaurant(context);
+      final searchRestaurantData = await ApiService().searchRestaurant(searchValue);
 
       if (searchRestaurantData.isEmpty) {
         _state = ResultState.noData;
@@ -173,8 +173,8 @@ class GlobalProvider extends ChangeNotifier {
   }
 
   /// send data review to api
-  Future sendReview(BuildContext context) async {
-    await ApiService().addReview(context);
+  Future sendReview() async {
+    await ApiService().addReview(detailRestaurantId, nameController.text, reviewController.text);
 
     notifyListeners();
   }

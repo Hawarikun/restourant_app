@@ -47,7 +47,7 @@ class _MainPageState extends State<MainPage> {
         bottomNavigationBar: Card(
           surfaceTintColor: Colors.white,
           elevation: 4,
-          child: SalomonBottomBar(
+          child:  SalomonBottomBar(
             currentIndex: provider.currentIndex,
             onTap: (i) => provider.setCurrentIndex(i),
             items: [

@@ -11,28 +11,24 @@ class SettingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          ListTile(
+    return Consumer<SchedulingProvider>(
+      builder: (context, scheduled, _) => Scaffold(
+        body: SafeArea(
+          child: ListTile(
+            key: const Key("switch"),
             title: const Text('Scheduling News'),
-            trailing: Consumer<SchedulingProvider>(
-              builder: (context, scheduled, _) {
-                return Switch.adaptive(
-                  key: const Key("Switch"),
-                  value: scheduled.isScheduled,
-                  onChanged: (value) async {
-                    if (Platform.isIOS) {
-                      customDialog(context);
-                    } else {
-                      scheduled.scheduledNews(value);
-                    }
-                  },
-                );
+            trailing: Switch.adaptive(
+              value: scheduled.isScheduled,
+              onChanged: (value) async {
+                if (Platform.isIOS) {
+                  customDialog(context);
+                } else {
+                  scheduled.scheduledNews(value);
+                }
               },
             ),
           ),
-        ],
+        ),
       ),
     );
   }

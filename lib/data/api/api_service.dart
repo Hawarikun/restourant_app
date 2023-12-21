@@ -1,10 +1,7 @@
 import 'dart:convert';
-import "package:flutter/material.dart";
 import "package:http/http.dart" as http;
-import "package:provider/provider.dart";
 
 import "package:restourant_app/data/model/restaurant.dart";
-import 'package:restourant_app/package/provider/global_provider.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://restaurant-api.dicoding.dev/';
@@ -30,11 +27,11 @@ class ApiService {
     }
   }
 
-  Future<DetailRestaurant> getDetailRestaurant(BuildContext context) async {
-    final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
+  Future<DetailRestaurant> getDetailRestaurant(String id) async {
+    // final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
 
     final response = await http.get(
-        Uri.parse("$_baseUrl/detail/${globalProvider.detailRestaurantId}"));
+        Uri.parse("$_baseUrl/detail/$id"));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -51,11 +48,10 @@ class ApiService {
     }
   }
 
-  Future<List<Restaurant>> searchRestaurant(BuildContext context) async {
-    final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
+  Future<List<Restaurant>> searchRestaurant(String searchValue) async {
 
     final response = await http
-        .get(Uri.parse("$_baseUrl/search?q=${globalProvider.searchValue}"));
+        .get(Uri.parse("$_baseUrl/search?q=$searchValue"));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -72,13 +68,12 @@ class ApiService {
     }
   }
 
-  Future<void> addReview(BuildContext context) async {
-    final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
+  Future<void> addReview(String id, String name,String review) async {
 
     var body = {
-      'id': globalProvider.detailRestaurantId,
-      'name': globalProvider.nameController.text,
-      'review': globalProvider.reviewController.text
+      'id': id,
+      'name': name,
+      'review': review
     };
 
     final response = await http.post(

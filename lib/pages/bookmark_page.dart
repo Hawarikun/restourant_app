@@ -13,33 +13,29 @@ class BookmarkPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          titlePage,
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+    return Consumer<DatabaseProvider>(
+      builder: (context, provider, child) => Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            titlePage,
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          backgroundColor: primaryColor,
         ),
-        backgroundColor: primaryColor,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Consumer<DatabaseProvider>(
-          builder: (context, provider, child) {
-            if (provider.state == ResultState.hasData) {
-              return ListView.builder(
-                itemCount: provider.bookmarks.length,
-                itemBuilder: (context, index) {
-                  return _buildRestaurantItem(provider.bookmarks[index]);
-                },
-              );
-            } else {
-              return Center(
-                child: Material(
-                  child: Text(provider.message),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: (provider.state == ResultState.hasData)
+              ? ListView.builder(
+                  itemCount: provider.bookmarks.length,
+                  itemBuilder: (context, index) {
+                    return _buildRestaurantItem(provider.bookmarks[index]);
+                  },
+                )
+              : Center(
+                  child: Material(
+                    child: Text(provider.message),
+                  ),
                 ),
-              );
-            }
-          },
         ),
       ),
     );
