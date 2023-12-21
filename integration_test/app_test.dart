@@ -27,8 +27,8 @@ class StateMakerState extends State<StateMaker> {
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  group('end-to-end test', () {
-    testWidgets('SplashSreen with integration test',
+  
+    testWidgets('test Search with integration test',
         (WidgetTester tester) async {
       await tester.pumpWidget(MaterialApp(
         home: ChangeNotifierProvider(
@@ -61,5 +61,5 @@ void main() {
 
       await tester.pumpAndSettle();
     });
-  });
+  
 }

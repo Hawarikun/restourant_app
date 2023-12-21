@@ -20,8 +20,6 @@ class DateTimeHelper {
     var resultTomorrow =
         completeFormat.parseStrict(tomorrowDateAndTime).toLocal();
 
-    print(now.isAfter(resultToday) ? resultTomorrow : resultToday);
-
     return now.isAfter(resultToday) ? resultTomorrow : resultToday;
   }
 }
