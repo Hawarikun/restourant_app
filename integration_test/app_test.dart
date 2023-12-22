@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:provider/provider.dart';
+import "package:http/http.dart" as http;
+
 
 import 'package:restourant_app/data/api/api_service.dart';
 import 'package:restourant_app/package/provider/global_provider.dart';
@@ -33,7 +35,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(
         home: ChangeNotifierProvider(
           create: (context) =>
-              GlobalProvider(apiService: ApiService(), context: context),
+              GlobalProvider(apiService: ApiService(http.Client()), context: context),
           child: const HomePage(),
         ),
       ));

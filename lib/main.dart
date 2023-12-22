@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 import 'package:restourant_app/common/navigation.dart';
 import 'package:restourant_app/data/api/api_service.dart';
@@ -47,7 +48,7 @@ class MyApp extends StatelessWidget {
         /// Global Provider
         ChangeNotifierProvider(
           create: (context) => GlobalProvider(
-            apiService: ApiService(),
+            apiService: ApiService(http.Client()),
             context: context,
           ),
         ),

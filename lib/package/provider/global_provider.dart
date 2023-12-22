@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:restourant_app/data/api/api_service.dart';
 import 'package:restourant_app/data/model/restaurant.dart';
 import 'package:restourant_app/package/utils/result_state.dart';
@@ -107,7 +108,7 @@ class GlobalProvider extends ChangeNotifier {
       _state = ResultState.loading;
       notifyListeners();
 
-      final restaurant = await ApiService().getAllRestaurant();
+      final restaurant = await ApiService(http.Client()).getAllRestaurant();
 
       if (restaurant.isEmpty) {
         _state = ResultState.noData;
@@ -138,7 +139,7 @@ class GlobalProvider extends ChangeNotifier {
       _state = ResultState.loading;
 
       final detailRestaurantData =
-          await ApiService().getDetailRestaurant(detailRestaurantId);
+          await ApiService(http.Client()).getDetailRestaurant(detailRestaurantId);
 
       _state = ResultState.hasData;
       _detailRestaurant = detailRestaurantData;
@@ -156,7 +157,7 @@ class GlobalProvider extends ChangeNotifier {
       _state = ResultState.loading;
       notifyListeners();
 
-      final searchRestaurantData = await ApiService().searchRestaurant(searchValue);
+      final searchRestaurantData = await ApiService(http.Client()).searchRestaurant(searchValue);
 
       if (searchRestaurantData.isEmpty) {
         _state = ResultState.noData;
@@ -174,7 +175,7 @@ class GlobalProvider extends ChangeNotifier {
 
   /// send data review to api
   Future sendReview() async {
-    await ApiService().addReview(detailRestaurantId, nameController.text, reviewController.text);
+    await ApiService(http.Client()).addReview(detailRestaurantId, nameController.text, reviewController.text);
 
     notifyListeners();
   }

@@ -8,8 +8,13 @@ class ApiService {
   static const String _type = 'Content-Type';
   static const String _header = 'application/json';
 
+  final http.Client client;
+
+  ApiService(this.client);
+
+
   Future<List<Restaurant>> getAllRestaurant() async {
-    final response = await http.get(Uri.parse("$_baseUrl/list"));
+    final response = await client.get(Uri.parse("${_baseUrl}list"));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -27,19 +32,20 @@ class ApiService {
     }
   }
 
-  Future<DetailRestaurant> getDetailRestaurant(String id) async {
-    // final globalProvider = Provider.of<GlobalProvider>(context, listen: false);
-
-    final response = await http.get(
-        Uri.parse("$_baseUrl/detail/$id"));
+  Future<DetailRestaurant> getDetailRestaurant(
+      String id) async {
+    final response = await client.get(Uri.parse("${_baseUrl}detail/$id"));
 
     if (response.statusCode == 200) {
+      print(id);
       final Map<String, dynamic> data = json.decode(response.body);
 
-      dynamic detailRestaurantData = data['restaurant'];
+      // var detailRestaurantData = data['restaurant'];
 
       DetailRestaurant detailRestaurant =
-          DetailRestaurant.fromJson(detailRestaurantData);
+          DetailRestaurant.fromJson(data['restaurant']);
+
+      print(detailRestaurant);
 
       return detailRestaurant;
     } else {
@@ -49,9 +55,8 @@ class ApiService {
   }
 
   Future<List<Restaurant>> searchRestaurant(String searchValue) async {
-
-    final response = await http
-        .get(Uri.parse("$_baseUrl/search?q=$searchValue"));
+    final response =
+        await http.get(Uri.parse("${_baseUrl}search?q=$searchValue"));
 
     if (response.statusCode == 200) {
       final Map<String, dynamic> data = json.decode(response.body);
@@ -68,17 +73,12 @@ class ApiService {
     }
   }
 
-  Future<void> addReview(String id, String name,String review) async {
-
-    var body = {
-      'id': id,
-      'name': name,
-      'review': review
-    };
+  Future<void> addReview(String id, String name, String review) async {
+    var body = {'id': id, 'name': name, 'review': review};
 
     final response = await http.post(
       Uri.parse(
-        "$_baseUrl/review",
+        "${_baseUrl}review",
       ),
       headers: <String, String>{
         _type: _header,
